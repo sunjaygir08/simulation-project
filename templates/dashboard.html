@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – Smart Warehouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="/">⬡ SMART<span>WH</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/dashboard" class="active">Dashboard</a></li>
+    <li><a href="/simulation">Simulation</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Page header -->
+<div class="page-header">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div class="live-dot" style="margin-bottom:0.4rem;">Live Data</div>
+      <h1>Warehouse Dashboard</h1>
+      <p>Last updated: <span id="last-updated">{{ data.last_updated }}</span></p>
+    </div>
+    <button class="refresh-btn" id="refreshBtn">↻  Refresh Data</button>
+  </div>
+</div>
+
+<section style="padding-top:2rem;">
+  <div class="container">
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-icon">🤖</div>
+        <div class="kpi-label">Active Robots</div>
+        <div class="kpi-value" id="kpi-active">{{ data.active_robots }}</div>
+        <div class="kpi-sub">of {{ data.total_robots }} total</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💤</div>
+        <div class="kpi-label">Idle Robots</div>
+        <div class="kpi-value" id="kpi-idle">{{ data.idle_robots }}</div>
+        <div class="kpi-sub">awaiting orders</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">Orders Completed</div>
+        <div class="kpi-value" id="kpi-completed">{{ data.completed_orders }}</div>
+        <div class="kpi-sub">this session</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-label">Pending Orders</div>
+        <div class="kpi-value" id="kpi-pending">{{ data.pending_orders }}</div>
+        <div class="kpi-sub">in queue</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-label">System Efficiency</div>
+        <div class="kpi-value" id="kpi-efficiency">{{ data.system_efficiency }}%</div>
+        <div class="kpi-sub">completed / total</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-icon">⏱</div>
+        <div class="kpi-label">Avg Completion</div>
+        <div class="kpi-value" id="kpi-avgtime">{{ data.avg_completion }} steps</div>
+        <div class="kpi-sub">per order</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Inventory</div>
+        <div class="kpi-value" id="kpi-inventory">{{ data.current_inventory }}</div>
+        <div class="kpi-sub">of {{ data.warehouse_capacity }} capacity</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-icon">🚚</div>
+        <div class="kpi-label">Items Delivered</div>
+        <div class="kpi-value">{{ data.items_delivered }}</div>
+        <div class="kpi-sub">total lifetime</div>
+      </div>
+    </div>
+
+    <!-- Inventory progress bar -->
+    <div class="chart-card" style="margin-bottom:1.25rem;">
+      <h3>Inventory Capacity</h3>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Warehouse Fill Level</span>
+          <span>{{ data.current_inventory }} / {{ data.warehouse_capacity }}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:{{ (data.current_inventory / data.warehouse_capacity * 100)|round(1) }}%"></div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Robot Utilisation Average</span>
+          <span>{{ data.avg_utilization }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:{{ data.avg_utilization }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-grid">
+      <div class="chart-card" style="grid-column: span 2;">
+        <h3>Hourly Throughput (last 12 hours)</h3>
+        <canvas id="throughputChart" height="100"
+          data-values="{{ data.hourly_throughput | tojson }}"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Order Status Breakdown</h3>
+        <canvas id="statusChart" height="220"
+          data-completed="{{ data.order_status.completed }}"
+          data-pending="{{ data.order_status.pending }}"
+          data-failed="{{ data.order_status.failed }}"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Robot Utilisation (%)</h3>
+        <canvas id="robotChart" height="220"
+          data-values="{{ data.robot_utilization | tojson }}"></canvas>
+      </div>
+    </div>
+
+    <!-- Robot status table -->
+    <div class="chart-card" style="margin-top:1.25rem;">
+      <h3>Robot Fleet Status</h3>
+      <table class="robot-table">
+        <thead>
+          <tr>
+            <th>Robot ID</th>
+            <th>Status</th>
+            <th>Utilisation</th>
+            <th>Current Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(data.total_robots) %}
+          {% set util = data.robot_utilization[i] %}
+          <tr>
+            <td><span style="font-family:var(--font-display);font-size:0.8rem;color:var(--neon-blue);">R-{{ '%02d'|format(i+1) }}</span></td>
+            <td>
+              {% if util > 80 %}
+                <span class="status-badge active">Active</span>
+              {% elif util > 50 %}
+                <span class="status-badge idle">Idle</span>
+              {% else %}
+                <span class="status-badge charging">Charging</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="progress-bar" style="width:120px;display:inline-block;">
+                <div class="progress-fill" style="width:{{ util }}%"></div>
+              </div>
+              <span style="font-family:var(--font-display);font-size:0.72rem;color:var(--neon-blue);margin-left:0.5rem;">{{ util }}%</span>
+            </td>
+            <td style="color:var(--text-muted);font-size:0.82rem;">
+              {% if util > 80 %}Delivering order #{{ (i+1)*17 % 99 + 1 }}
+              {% elif util > 50 %}Waiting for assignment
+              {% else %}Battery recharge
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="logo-foot">⬡ SmartWH</div>
+  <p>Dawood University of Engineering &amp; Technology · Dept. of Computer Systems Engineering</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

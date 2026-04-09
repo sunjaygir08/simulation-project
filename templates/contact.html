@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact – Smart Warehouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="nav-logo" href="/">⬡ SMART<span>WH</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/simulation">Simulation</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact" class="active">Contact</a></li>
+  </ul>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Contact Us</h1>
+    <p>Have questions about this project? Send us a message.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Info panel -->
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        <p>We welcome feedback, questions, and collaboration requests regarding this simulation project.</p>
+
+        <div class="info-item">
+          <div class="icon">🏛️</div>
+          <div class="txt">
+            <strong>Institution</strong>
+            <span>Dawood University of Engineering &amp; Technology</span>
+            <span>Dept. of Computer Systems Engineering</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon">📚</div>
+          <div class="txt">
+            <strong>Course</strong>
+            <span>Modelling &amp; Simulation — 4th Semester</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon">👥</div>
+          <div class="txt">
+            <strong>Team</strong>
+            <span>Muhammad Ahmed (CSE-007)</span>
+            <span>Sanjay Gir (CSE-008)</span>
+            <span>Sanaullah Chauhan (CSE-016)</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon">📍</div>
+          <div class="txt">
+            <strong>Location</strong>
+            <span>Karachi, Sindh, Pakistan</span>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div style="margin-top:2rem;">
+          <div class="about-block">
+            <h3>Quick Links</h3>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            <a href="/dashboard" class="btn btn-outline" style="text-align:center;">⬡ View Dashboard</a>
+            <a href="/simulation" class="btn btn-outline" style="text-align:center;">▶ Run Simulation</a>
+            <a href="/about" class="btn btn-outline" style="text-align:center;">📄 About Project</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="contact-form-card">
+        <h3 style="font-family:var(--font-display);font-size:0.85rem;letter-spacing:0.1em;
+                   text-transform:uppercase;color:var(--neon-blue);margin-bottom:1.5rem;">
+          Send a Message
+        </h3>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-msg {{ category }}">
+                {% if category == 'success' %}✓{% else %}⚠{% endif %}
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Validation errors -->
+        {% if errors %}
+          <ul class="error-list" style="margin-bottom:1rem;">
+            {% for err in errors %}<li>{{ err }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        <form method="POST" action="/contact">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name"
+                   placeholder="e.g. Muhammad Ahmed"
+                   value="{{ form_data.get('name', '') }}" required/>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email"
+                   placeholder="you@example.com"
+                   value="{{ form_data.get('email', '') }}" required/>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message"
+                      placeholder="Your question or feedback…" required>{{ form_data.get('message', '') }}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            ✉ Send Message
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="logo-foot">⬡ SmartWH</div>
+  <p>Dawood University of Engineering &amp; Technology · Dept. of Computer Systems Engineering</p>
+  <p style="margin-top:0.4rem;">Muhammad Ahmed &nbsp;|&nbsp; Sanjay Gir &nbsp;|&nbsp; Sanaullah Chauhan</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

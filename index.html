@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Warehouse Automation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <a class="nav-logo" href="/">⬡ SMART<span>WH</span></a>
+  <ul class="nav-links">
+    <li><a href="/" class="active">Home</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/simulation">Simulation</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+  <button class="hamburger" aria-label="menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">AI-Powered Warehouse System</div>
+    <h1>
+      <span class="neon-text">Smart Warehouse</span><br/>
+      <span class="neon-green">Automation</span> System
+    </h1>
+    <p class="hero-sub">
+      Autonomous robots. Real-time order fulfilment. AI-driven path optimisation.
+      A full simulation of next-generation warehouse logistics.
+    </p>
+    <div class="hero-buttons">
+      <a href="/dashboard" class="btn btn-primary">⬡ View Dashboard</a>
+      <a href="/simulation" class="btn btn-outline">▶ Run Simulation</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats strip ── -->
+<div style="padding:0 2rem 3rem; max-width:1100px; margin:0 auto;">
+  <div class="hero-stats">
+    <div class="stat-chip"><div class="val">5</div><div class="lbl">Autonomous Robots</div></div>
+    <div class="stat-chip"><div class="val">12×12</div><div class="lbl">Warehouse Grid</div></div>
+    <div class="stat-chip"><div class="val">95%</div><div class="lbl">System Efficiency</div></div>
+    <div class="stat-chip"><div class="val">BFS</div><div class="lbl">Path Algorithm</div></div>
+    <div class="stat-chip"><div class="val">Flask</div><div class="lbl">Backend</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── Features ── -->
+<section>
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-label">Core Features</div>
+      <h2 class="section-title">What Makes It Smart</h2>
+      <p class="section-desc">Combining AI path-finding, real-time simulation, and performance analytics into one system.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>Autonomous Robots</h3>
+        <p>Multiple robots operate concurrently, each assigned orders and navigating the warehouse grid without human input.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <h3>BFS Pathfinding</h3>
+        <p>Breadth-First Search guarantees the shortest collision-free path from robot position to shelf and back to exit.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3>Order Management</h3>
+        <p>Orders are generated dynamically and assigned to the nearest idle robot, minimising wait time and improving throughput.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Performance Metrics</h3>
+        <p>Live tracking of robot utilisation, order completion time, system efficiency, and distance travelled per delivery.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Discrete Simulation</h3>
+        <p>Time-step driven simulation engine ensures accurate modelling of concurrent robot movement and order queue processing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Experiment Analysis</h3>
+        <p>Three controlled experiments compare different robot counts, order volumes, and grid sizes with chart-based results.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── How it works ── -->
+<section>
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-label">Workflow</div>
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-desc">Six discrete steps from order generation to delivery.</p>
+    </div>
+    <div class="features-grid">
+      {% for step in [
+        ("01", "Order Generated", "A customer order with a random shelf location is added to the queue."),
+        ("02", "Robot Assigned",  "The nearest idle robot is selected using Manhattan distance comparison."),
+        ("03", "Path Computed",   "BFS calculates the shortest obstacle-free route to the shelf."),
+        ("04", "Item Picked",     "Robot navigates to the shelf and picks up the item."),
+        ("05", "Item Delivered",  "Robot carries the item to the exit drop-off point."),
+        ("06", "Metrics Updated", "Completion time, utilisation, and efficiency are recalculated."),
+      ] %}
+      <div class="feature-card">
+        <div class="feature-icon" style="font-family:var(--font-display);font-size:1rem;color:var(--neon-green);">
+          {{ step[0] }}
+        </div>
+        <h3>{{ step[1] }}</h3>
+        <p>{{ step[2] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="logo-foot">⬡ SmartWH</div>
+  <p>Dawood University of Engineering &amp; Technology · Dept. of Computer Systems Engineering</p>
+  <p style="margin-top:0.4rem;">Muhammad Ahmed &nbsp;|&nbsp; Sanjay Gir &nbsp;|&nbsp; Sanaullah Chauhan</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
