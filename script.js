@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', observeReveal);
 function initDashboardCharts() {
   if (typeof Chart === 'undefined') return;
 
-  const neonBlue   = '#00d4ff';
-  const neonGreen  = '#00ff9d';
-  const neonPurple = '#a855f7';
-  const gridColor  = 'rgba(0,212,255,0.07)';
-  const textColor  = '#5d7fa0';
+  const neonBlue   = '#6fbaf3';
+  const neonGreen  = '#8fd2ff';
+  const neonPurple = '#b8dcff';
+  const gridColor  = 'rgba(173,218,255,0.18)';
+  const textColor  = '#d5e8f9';
 
   Chart.defaults.color = textColor;
-  Chart.defaults.font.family = "'Exo 2', sans-serif";
+  Chart.defaults.font.family = "'Nunito Sans', sans-serif";
 
   /* ── Throughput line chart ── */
   const throughputCtx = document.getElementById('throughputChart');
@@ -69,7 +69,7 @@ function initDashboardCharts() {
           label          : 'Orders / hr',
           data           : rawData,
           borderColor    : neonBlue,
-          backgroundColor: 'rgba(0,212,255,0.08)',
+          backgroundColor: 'rgba(143,210,255,0.22)',
           borderWidth    : 2,
           pointBackgroundColor: neonBlue,
           pointRadius    : 4,
@@ -101,8 +101,8 @@ function initDashboardCharts() {
         labels  : ['Completed', 'Pending', 'Failed'],
         datasets: [{
           data           : [completed, pending, failed],
-          backgroundColor: [neonGreen, neonBlue, '#ff4444'],
-          borderColor    : '#0d1e33',
+          backgroundColor: [neonGreen, neonBlue, '#ff8f8f'],
+          borderColor    : '#0b2038',
           borderWidth    : 3,
           hoverOffset    : 6,
         }]
@@ -134,8 +134,8 @@ function initDashboardCharts() {
           label          : 'Utilization %',
           data           : values,
           backgroundColor: values.map(v =>
-            v > 85 ? 'rgba(0,255,157,0.6)' :
-            v > 65 ? 'rgba(0,212,255,0.6)' : 'rgba(168,85,247,0.6)'),
+            v > 85 ? 'rgba(143,210,255,0.7)' :
+            v > 65 ? 'rgba(111,186,243,0.7)' : 'rgba(184,220,255,0.65)'),
           borderColor    : values.map(v =>
             v > 85 ? neonGreen : v > 65 ? neonBlue : neonPurple),
           borderWidth    : 1,
@@ -208,17 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Colors ──
   const C = {
-    bg      : '#04090f',
-    grid    : 'rgba(0,212,255,0.07)',
-    shelf   : 'rgba(0,212,255,0.18)',
-    shelfBd : 'rgba(0,212,255,0.5)',
-    exit    : 'rgba(0,255,157,0.25)',
-    exitBd  : '#00ff9d',
-    robot   : ['#00d4ff','#a855f7','#ff9f43','#ff5c5c','#00ff9d'],
-    robotGlow: ['rgba(0,212,255,0.4)','rgba(168,85,247,0.4)',
-                'rgba(255,159,67,0.4)','rgba(255,92,92,0.4)','rgba(0,255,157,0.4)'],
-    item    : '#f9ca24',
-    path    : 'rgba(0,212,255,0.15)',
+    bg      : '#0c2a4b',
+    grid    : 'rgba(173,218,255,0.20)',
+    shelf   : 'rgba(173,218,255,0.14)',
+    shelfBd : 'rgba(173,218,255,0.60)',
+    exit    : 'rgba(143,210,255,0.24)',
+    exitBd  : '#ffffff',
+    robot   : ['#8fd2ff', '#6fbaf3', '#ffffff', '#9ecfff', '#4da9f0'],
+    robotGlow: ['rgba(143,210,255,0.34)', 'rgba(111,186,243,0.34)',
+                'rgba(255,255,255,0.30)', 'rgba(158,207,255,0.30)', 'rgba(77,169,240,0.30)'],
+    item    : '#ffffff',
+    path    : 'rgba(173,218,255,0.12)',
   };
 
   // ── Shelves (fixed) ──
@@ -308,8 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.lineWidth   = 0.8;
       roundRect(ctx, cellX(s.c)+3, cellY(s.r)+3, CELL-6, CELL-6, 4);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle  = 'rgba(0,212,255,0.7)';
-      ctx.font       = '10px Orbitron, monospace';
+      ctx.fillStyle  = 'rgba(227,242,255,0.95)';
+      ctx.font       = '10px Montserrat, sans-serif';
       ctx.textAlign  = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('📦', cellX(s.c)+CELL/2, cellY(s.r)+CELL/2);
@@ -322,8 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.lineWidth   = 1;
     roundRect(ctx, cellX(EXIT.c)+2, cellY(EXIT.r)+2, CELL-4, CELL-4, 4);
     ctx.fill(); ctx.stroke();
-    ctx.fillStyle    = '#00ff9d';
-    ctx.font         = '9px Orbitron, monospace';
+    ctx.fillStyle    = '#ffffff';
+    ctx.font         = '9px Montserrat, sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('EXIT', cellX(EXIT.c)+CELL/2, cellY(EXIT.r)+CELL/2);
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fill();
 
     // inner ring
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.strokeStyle = 'rgba(7,21,40,0.45)';
     ctx.lineWidth   = 1.5;
     ctx.beginPath();
     ctx.arc(px, py, 9, 0, Math.PI*2);
@@ -366,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.shadowColor = 'transparent';
 
     // ID label
-    ctx.fillStyle    = '#050a12';
-    ctx.font         = 'bold 9px Orbitron, monospace';
+    ctx.fillStyle    = '#00152c';
+    ctx.font         = 'bold 9px Montserrat, sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('R' + (robot.id+1), px, py);

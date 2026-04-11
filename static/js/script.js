@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', observeReveal);
 function initDashboardCharts() {
   if (typeof Chart === 'undefined') return;
 
-  const neonBlue   = '#00d4ff';
-  const neonGreen  = '#18b6ff';
-  const neonPurple = '#6b8cff';
-  const gridColor  = 'rgba(45,140,255,0.08)';
-  const textColor  = '#5f7f9e';
+  const neonBlue   = '#6fbaf3';
+  const neonGreen  = '#8fd2ff';
+  const neonPurple = '#b8dcff';
+  const gridColor  = 'rgba(173,218,255,0.18)';
+  const textColor  = '#d5e8f9';
 
   Chart.defaults.color = textColor;
-  Chart.defaults.font.family = "'Poppins', sans-serif";
+  Chart.defaults.font.family = "'Nunito Sans', sans-serif";
 
   /* ── Throughput line chart ── */
   const throughputCtx = document.getElementById('throughputChart');
@@ -69,7 +69,7 @@ function initDashboardCharts() {
           label          : 'Orders / hr',
           data           : rawData,
           borderColor    : neonBlue,
-          backgroundColor: 'rgba(0,212,255,0.08)',
+          backgroundColor: 'rgba(143,210,255,0.22)',
           borderWidth    : 2,
           pointBackgroundColor: neonBlue,
           pointRadius    : 4,
@@ -101,8 +101,8 @@ function initDashboardCharts() {
         labels  : ['Completed', 'Pending', 'Failed'],
         datasets: [{
           data           : [completed, pending, failed],
-          backgroundColor: [neonGreen, neonBlue, '#ff4444'],
-          borderColor    : '#0d1e33',
+          backgroundColor: [neonGreen, neonBlue, '#ff8f8f'],
+          borderColor    : '#0b2038',
           borderWidth    : 3,
           hoverOffset    : 6,
         }]
@@ -134,8 +134,8 @@ function initDashboardCharts() {
           label          : 'Utilization %',
           data           : values,
           backgroundColor: values.map(v =>
-            v > 85 ? 'rgba(0,255,157,0.6)' :
-            v > 65 ? 'rgba(0,212,255,0.6)' : 'rgba(168,85,247,0.6)'),
+            v > 85 ? 'rgba(143,210,255,0.7)' :
+            v > 65 ? 'rgba(111,186,243,0.7)' : 'rgba(184,220,255,0.65)'),
           borderColor    : values.map(v =>
             v > 85 ? neonGreen : v > 65 ? neonBlue : neonPurple),
           borderWidth    : 1,
@@ -208,17 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Colors ──
   const C = {
-    bg      : '#f7fbff',
-    grid    : 'rgba(45,140,255,0.08)',
-    shelf   : 'rgba(45,140,255,0.12)',
-    shelfBd : 'rgba(45,140,255,0.30)',
-    exit    : 'rgba(24,182,255,0.14)',
-    exitBd  : '#2d8cff',
-    robot   : ['#2d8cff','#6b8cff','#18b6ff','#ff8a65','#16a085'],
-    robotGlow: ['rgba(45,140,255,0.25)','rgba(107,140,255,0.25)',
-                'rgba(24,182,255,0.25)','rgba(255,138,101,0.25)','rgba(22,160,133,0.25)'],
-    item    : '#2d8cff',
-    path    : 'rgba(45,140,255,0.12)',
+    bg      : '#0c2a4b',
+    grid    : 'rgba(173,218,255,0.20)',
+    shelf   : 'rgba(173,218,255,0.14)',
+    shelfBd : 'rgba(173,218,255,0.60)',
+    exit    : 'rgba(143,210,255,0.24)',
+    exitBd  : '#ffffff',
+    robot   : ['#8fd2ff', '#6fbaf3', '#ffffff', '#9ecfff', '#4da9f0'],
+    robotGlow: ['rgba(143,210,255,0.34)', 'rgba(111,186,243,0.34)',
+                'rgba(255,255,255,0.30)', 'rgba(158,207,255,0.30)', 'rgba(77,169,240,0.30)'],
+    item    : '#ffffff',
+    path    : 'rgba(173,218,255,0.12)',
   };
 
   // ── Shelves (fixed) ──
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.lineWidth   = 0.8;
       roundRect(ctx, cellX(s.c)+3, cellY(s.r)+3, CELL-6, CELL-6, 4);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle  = 'rgba(0,212,255,0.7)';
+      ctx.fillStyle  = 'rgba(227,242,255,0.95)';
       ctx.font       = '10px Montserrat, sans-serif';
       ctx.textAlign  = 'center';
       ctx.textBaseline = 'middle';
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.lineWidth   = 1;
     roundRect(ctx, cellX(EXIT.c)+2, cellY(EXIT.r)+2, CELL-4, CELL-4, 4);
     ctx.fill(); ctx.stroke();
-    ctx.fillStyle    = '#2d8cff';
+    ctx.fillStyle    = '#ffffff';
     ctx.font         = '9px Montserrat, sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fill();
 
     // inner ring
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.strokeStyle = 'rgba(7,21,40,0.45)';
     ctx.lineWidth   = 1.5;
     ctx.beginPath();
     ctx.arc(px, py, 9, 0, Math.PI*2);
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.shadowColor = 'transparent';
 
     // ID label
-    ctx.fillStyle    = '#ffffff';
+    ctx.fillStyle    = '#00152c';
     ctx.font         = 'bold 9px Montserrat, sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
