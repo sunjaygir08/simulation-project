@@ -97,7 +97,7 @@
           <span>{{ data.current_inventory }} / {{ data.warehouse_capacity }}</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" style="width:{{ (data.current_inventory / data.warehouse_capacity * 100)|round(1) }}%"></div>
+          <div class="progress-fill" data-width="{{ (data.current_inventory / data.warehouse_capacity * 100)|round(1) }}"></div>
         </div>
       </div>
       <div class="progress-wrap">
@@ -106,7 +106,7 @@
           <span>{{ data.avg_utilization }}%</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" style="width:{{ data.avg_utilization }}%"></div>
+          <div class="progress-fill" data-width="{{ data.avg_utilization }}"></div>
         </div>
       </div>
     </div>
@@ -160,7 +160,7 @@
             </td>
             <td>
               <div class="progress-bar" style="width:120px;display:inline-block;">
-                <div class="progress-fill" style="width:{{ util }}%"></div>
+                <div class="progress-fill" data-width="{{ util }}"></div>
               </div>
               <span style="font-family:var(--font-display);font-size:0.72rem;color:var(--neon-blue);margin-left:0.5rem;">{{ util }}%</span>
             </td>
