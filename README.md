@@ -5,7 +5,7 @@
 > Dawood University of Engineering & Technology  
 > Department of Computer Systems Engineering  
 > Course: Modelling & Simulation (4th Semester)  
-> Team: Muhammad Ahmed (CSE-007) · Sanjay Gir (CSE-008) · Sanaullah Chauhan (CSE-016)
+> Team: Muhammad Ahmed (CSE-007) · Sunjay Gir (CSE-008) · Sanaullah Chauhan (CSE-016)
 
 ---
 
@@ -160,4 +160,4 @@ python app.py
 
 ---
 
-*Built for the Modelling & Simulation CEP — DUET 2024/25*
+*Built for the Modelling & Simulation CEP — DUET 2026*
