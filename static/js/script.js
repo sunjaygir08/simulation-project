@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', observeReveal);
 function initDashboardCharts() {
   if (typeof Chart === 'undefined') return;
 
-  const neonBlue   = '#6fbaf3';
-  const neonGreen  = '#8fd2ff';
-  const neonPurple = '#b8dcff';
-  const gridColor  = 'rgba(173,218,255,0.18)';
-  const textColor  = '#d5e8f9';
+  const primaryBlue = '#0052cc';
+  const secondaryBlue = '#007bff';
+  const skyBlue = '#0ea5e9';
+  const gridColor  = 'rgba(0,82,204,0.12)';
+  const textColor  = '#1a1a2e';
 
   Chart.defaults.color = textColor;
-  Chart.defaults.font.family = "'Nunito Sans', sans-serif";
+  Chart.defaults.font.family = "'Inter', sans-serif";
 
   /* ── Throughput line chart ── */
   const throughputCtx = document.getElementById('throughputChart');
@@ -68,11 +68,11 @@ function initDashboardCharts() {
         datasets: [{
           label          : 'Orders / hr',
           data           : rawData,
-          borderColor    : neonBlue,
-          backgroundColor: 'rgba(143,210,255,0.22)',
-          borderWidth    : 2,
-          pointBackgroundColor: neonBlue,
-          pointRadius    : 4,
+          borderColor    : primaryBlue,
+          backgroundColor: 'rgba(0,82,204,0.08)',
+          borderWidth    : 3,
+          pointBackgroundColor: primaryBlue,
+          pointRadius    : 5,
           tension        : 0.4,
           fill           : true,
         }]
@@ -101,10 +101,10 @@ function initDashboardCharts() {
         labels  : ['Completed', 'Pending', 'Failed'],
         datasets: [{
           data           : [completed, pending, failed],
-          backgroundColor: [neonGreen, neonBlue, '#ff8f8f'],
-          borderColor    : '#0b2038',
+          backgroundColor: [skyBlue, primaryBlue, '#dc2626'],
+          borderColor    : '#ffffff',
           borderWidth    : 3,
-          hoverOffset    : 6,
+          hoverOffset    : 8,
         }]
       },
       options: {
@@ -113,7 +113,7 @@ function initDashboardCharts() {
         plugins    : {
           legend: {
             position: 'bottom',
-            labels  : { padding: 16, font: { size: 11 } }
+            labels  : { padding: 16, font: { size: 12, weight: '600' } }
           }
         }
       }
@@ -134,12 +134,12 @@ function initDashboardCharts() {
           label          : 'Utilization %',
           data           : values,
           backgroundColor: values.map(v =>
-            v > 85 ? 'rgba(143,210,255,0.7)' :
-            v > 65 ? 'rgba(111,186,243,0.7)' : 'rgba(184,220,255,0.65)'),
+            v > 85 ? 'rgba(14,165,233,0.8)' :
+            v > 65 ? 'rgba(0,82,204,0.8)' : 'rgba(0,123,255,0.7)'),
           borderColor    : values.map(v =>
-            v > 85 ? neonGreen : v > 65 ? neonBlue : neonPurple),
-          borderWidth    : 1,
-          borderRadius   : 6,
+            v > 85 ? skyBlue : v > 65 ? primaryBlue : secondaryBlue),
+          borderWidth    : 2,
+          borderRadius   : 8,
         }]
       },
       options: {
@@ -208,17 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Colors ──
   const C = {
-    bg      : '#0c2a4b',
-    grid    : 'rgba(173,218,255,0.20)',
-    shelf   : 'rgba(173,218,255,0.14)',
-    shelfBd : 'rgba(173,218,255,0.60)',
-    exit    : 'rgba(143,210,255,0.24)',
-    exitBd  : '#ffffff',
-    robot   : ['#8fd2ff', '#6fbaf3', '#ffffff', '#9ecfff', '#4da9f0'],
-    robotGlow: ['rgba(143,210,255,0.34)', 'rgba(111,186,243,0.34)',
-                'rgba(255,255,255,0.30)', 'rgba(158,207,255,0.30)', 'rgba(77,169,240,0.30)'],
-    item    : '#ffffff',
-    path    : 'rgba(173,218,255,0.12)',
+    bg      : '#ffffff',
+    grid    : 'rgba(0,82,204,0.08)',
+    shelf   : 'rgba(0,82,204,0.12)',
+    shelfBd : 'rgba(0,82,204,0.6)',
+    exit    : 'rgba(14,165,233,0.18)',
+    exitBd  : '#0052cc',
+    robot   : ['#0052cc', '#007bff', '#0ea5e9', '#1e81f7', '#6c9de8'],
+    robotGlow: ['rgba(0,82,204,0.3)', 'rgba(0,123,255,0.3)',
+                'rgba(14,165,233,0.3)', 'rgba(30,129,247,0.3)', 'rgba(108,157,232,0.3)'],
+    item    : '#0052cc',
+    path    : 'rgba(0,82,204,0.1)',
   };
 
   // ── Shelves (fixed) ──
