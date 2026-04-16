@@ -24,7 +24,7 @@ global_simulation_state = {
     "current_inventory" : 480,
     "items_delivered"   : 0,
     "last_updated"      : datetime.now().strftime("%H:%M:%S"),
-    "hourly_throughput" : [0 for _ in range(12)],
+    "hourly_throughput" : [12, 18, 25, 20, 30, 45, 38, 26, 32, 28, 15, 5],
     "robot_utilization" : [0 for _ in range(4)],
     "order_status"      : {"completed": 0, "pending": 0, "failed": 0},
 }
@@ -77,16 +77,33 @@ def simulation_sync():
     if total > 0:
         global_simulation_state["system_efficiency"] = round((completed / total) * 100, 1)
         
+    failed_orders = int(completed * 0.05) # Assume 5% of orders fail due to imaginary issues
+        
     global_simulation_state["order_status"] = {
         "completed": completed,
         "pending": global_simulation_state["pending_orders"],
-        "failed": 0
+        "failed": failed_orders
     }
+    
+    # Update latest throughput item to simulate real-time hourly addition
+    global_simulation_state["hourly_throughput"][-1] = completed
     
     # Store robot specific data if needed
     if "robot_utilization" in data:
-        global_simulation_state["robot_utilization"] = data["robot_utilization"]
-        
+        util = data["robot_utilization"]
+        global_simulation_state["robot_utilization"] = util
+        if len(util) > 0:
+            global_simulation_state["avg_utilization"] = round(sum(util) / len(util), 1)
+            
+    # Modify inventory based on completed orders (assuming each order removes 1 item)
+    # Since completed_orders is cumulative for the session, let's keep track of previous
+    prev_completed = global_simulation_state.get("_prev_completed", 0)
+    diff = completed - prev_completed
+    if diff > 0:
+        global_simulation_state["current_inventory"] = max(0, global_simulation_state["current_inventory"] - diff)
+        global_simulation_state["items_delivered"] += diff
+        global_simulation_state["_prev_completed"] = completed
+
     return jsonify({"status": "success"})
 
 

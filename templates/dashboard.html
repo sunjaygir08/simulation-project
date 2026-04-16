@@ -94,19 +94,19 @@
       <div class="progress-wrap">
         <div class="progress-label">
           <span>Warehouse Fill Level</span>
-          <span>{{ data.current_inventory }} / {{ data.warehouse_capacity }}</span>
+          <span id="lbl-inv-fill">{{ data.current_inventory }} / {{ data.warehouse_capacity }}</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" data-width="{{ (data.current_inventory / data.warehouse_capacity * 100)|round(1) }}"></div>
+          <div class="progress-fill" id="bar-inv-fill" data-width="{{ (data.current_inventory / data.warehouse_capacity * 100)|round(1) }}"></div>
         </div>
       </div>
       <div class="progress-wrap">
         <div class="progress-label">
           <span>Robot Utilisation Average</span>
-          <span>{{ data.avg_utilization }}%</span>
+          <span id="lbl-avg-util">{{ data.avg_utilization }}%</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" data-width="{{ data.avg_utilization }}"></div>
+          <div class="progress-fill" id="bar-avg-util" data-width="{{ data.avg_utilization }}"></div>
         </div>
       </div>
     </div>
@@ -149,7 +149,7 @@
           {% set util = data.robot_utilization[i] %}
           <tr>
             <td><span style="font-family:var(--font-display);font-size:0.8rem;color:var(--neon-blue);">R-{{ '%02d'|format(i+1) }}</span></td>
-            <td>
+            <td id="rob-status-{{ i }}">
               {% if util > 80 %}
                 <span class="status-badge active">Active</span>
               {% elif util > 50 %}
@@ -160,11 +160,11 @@
             </td>
             <td>
               <div class="progress-bar" style="width:120px;display:inline-block;">
-                <div class="progress-fill" data-width="{{ util }}"></div>
+                <div class="progress-fill" id="rob-bar-{{ i }}" data-width="{{ util }}"></div>
               </div>
-              <span style="font-family:var(--font-display);font-size:0.72rem;color:var(--neon-blue);margin-left:0.5rem;">{{ util }}%</span>
+              <span id="rob-pct-{{ i }}" style="font-family:var(--font-display);font-size:0.72rem;color:var(--neon-blue);margin-left:0.5rem;">{{ util }}%</span>
             </td>
-            <td style="color:var(--text-muted);font-size:0.82rem;">
+            <td id="rob-task-{{ i }}" style="color:var(--text-muted);font-size:0.82rem;">
               {% if util > 80 %}Delivering order #{{ (i+1)*17 % 99 + 1 }}
               {% elif util > 50 %}Waiting for assignment
               {% else %}Battery recharge

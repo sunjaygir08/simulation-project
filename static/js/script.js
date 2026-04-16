@@ -38,13 +38,26 @@ const observeReveal = () => {
     obs.observe(el);
   });
 };
-document.addEventListener('DOMContentLoaded', observeReveal);
+
+function updateProgressBars() {
+  document.querySelectorAll('.progress-fill').forEach(el => {
+    let w = el.getAttribute('data-width') || 0;
+    el.style.width = w + '%';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  observeReveal();
+  updateProgressBars();
+});
 
 /* ═══════════════════════════════════════════════
    DASHBOARD  –  Charts (Chart.js)
 ═══════════════════════════════════════════════ */
 function initDashboardCharts() {
   if (typeof Chart === 'undefined') return;
+
+  window.dashCharts = {};
 
   const primaryBlue = '#0052cc';
   const secondaryBlue = '#007bff';
@@ -61,7 +74,7 @@ function initDashboardCharts() {
     const rawData = JSON.parse(throughputCtx.dataset.values || '[]');
     const labels  = rawData.map((_, i) => `${i * 2}:00`);
 
-    new Chart(throughputCtx, {
+    window.dashCharts.throughput = new Chart(throughputCtx, {
       type: 'line',
       data: {
         labels,
@@ -95,7 +108,7 @@ function initDashboardCharts() {
     const pending   = parseInt(statusCtx.dataset.pending   || 0);
     const failed    = parseInt(statusCtx.dataset.failed    || 0);
 
-    new Chart(statusCtx, {
+    window.dashCharts.status = new Chart(statusCtx, {
       type: 'doughnut',
       data: {
         labels  : ['Completed', 'Pending', 'Failed'],
@@ -126,7 +139,7 @@ function initDashboardCharts() {
     const values = JSON.parse(robotCtx.dataset.values || '[]');
     const labels = values.map((_, i) => `Robot ${i + 1}`);
 
-    new Chart(robotCtx, {
+    window.dashCharts.robot = new Chart(robotCtx, {
       type: 'bar',
       data: {
         labels,
@@ -168,7 +181,7 @@ function initDashboardRefresh() {
       const res  = await fetch('/api/dashboard-refresh');
       const data = await res.json();
 
-      // update KPI values
+      // Update Top KPIs
       const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
       set('kpi-active',   data.active_robots);
       set('kpi-idle',     data.idle_robots);
@@ -178,6 +191,54 @@ function initDashboardRefresh() {
       set('kpi-avgtime',  data.avg_completion + ' steps');
       set('kpi-inventory', data.current_inventory);
       set('last-updated', data.last_updated);
+      
+      // Update DOM Inventory & Average UI
+      set('lbl-inv-fill', `${data.current_inventory} / ${data.warehouse_capacity}`);
+      const invBar = document.getElementById('bar-inv-fill');
+      if (invBar) invBar.setAttribute('data-width', Math.round((data.current_inventory / data.warehouse_capacity)*100));
+      
+      set('lbl-avg-util', `${data.avg_utilization}%`);
+      const avgBar = document.getElementById('bar-avg-util');
+      if (avgBar) avgBar.setAttribute('data-width', data.avg_utilization);
+      
+      // Update Robot Table
+      if (data.robot_utilization) {
+        data.robot_utilization.forEach((util, i) => {
+          let statusHtml = '';
+          let taskHtml = '';
+          if (util > 80) { statusHtml = '<span class="status-badge active">Active</span>'; taskHtml = 'Delivering order #' + (data.completed_orders + i); }
+          else if (util > 50) { statusHtml = '<span class="status-badge idle">Idle</span>'; taskHtml = 'Waiting for assignment'; }
+          else { statusHtml = '<span class="status-badge charging">Charging</span>'; taskHtml = 'Battery recharge'; }
+          
+          const s = document.getElementById(`rob-status-${i}`);
+          if (s) s.innerHTML = statusHtml;
+          
+          const t = document.getElementById(`rob-task-${i}`);
+          if (t) t.innerHTML = taskHtml;
+          
+          const p = document.getElementById(`rob-pct-${i}`);
+          if (p) p.innerHTML = `${util}%`;
+          
+          const b = document.getElementById(`rob-bar-${i}`);
+          if (b) b.setAttribute('data-width', util);
+        });
+      }
+      
+      updateProgressBars();
+
+      // Update Charts
+      if (window.dashCharts.throughput && data.hourly_throughput) {
+        window.dashCharts.throughput.data.datasets[0].data = data.hourly_throughput;
+        window.dashCharts.throughput.update();
+      }
+      if (window.dashCharts.status && data.order_status) {
+        window.dashCharts.status.data.datasets[0].data = [data.order_status.completed, data.order_status.pending, data.order_status.failed];
+        window.dashCharts.status.update();
+      }
+      if (window.dashCharts.robot && data.robot_utilization) {
+        window.dashCharts.robot.data.datasets[0].data = data.robot_utilization;
+        window.dashCharts.robot.update();
+      }
 
     } catch (e) { console.error(e); }
     finally {
@@ -412,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Robot tick ──
   function tickRobot(robot) {
     robot.tickAcc += simSpeed;
-    if (robot.tickAcc < 8) return;
+    if (robot.tickAcc < 32) return;
     robot.tickAcc = 0;
 
     if (robot.pathIdx < robot.path.length - 1) {
@@ -483,6 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const active = robots.filter(r => r.state === 'carrying' || (r.state === 'moving' && r.pathIdx < r.path.length - 1)).length;
     const idle = NUM_ROBOTS - active;
     
+    const utilMetrics = robots.map(r => r.state === 'carrying' ? 98 : (r.state === 'moving' ? 75 : 15));
+    
     fetch('/api/simulation-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -490,7 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
         active_robots: active,
         idle_robots: idle,
         total_orders: totalOrders,
-        completed_orders: ordersCompleted
+        completed_orders: ordersCompleted,
+        robot_utilization: utilMetrics
       })
     }).catch(e => console.error("Sync error:", e));
   }, 1000);
