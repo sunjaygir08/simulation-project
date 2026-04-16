@@ -173,9 +173,11 @@ function initDashboardRefresh() {
   const btn = document.getElementById('refreshBtn');
   if (!btn) return;
 
-  btn.addEventListener('click', async () => {
-    btn.textContent = '↻  Refreshing…';
-    btn.disabled = true;
+  const fetchAndUpdate = async (isManual = false) => {
+    if (isManual) {
+      btn.textContent = '↻  Refreshing…';
+      btn.disabled = true;
+    }
 
     try {
       const res  = await fetch('/api/dashboard-refresh');
@@ -240,12 +242,20 @@ function initDashboardRefresh() {
         window.dashCharts.robot.update();
       }
 
-    } catch (e) { console.error(e); }
-    finally {
-      btn.textContent = '↻  Refresh Data';
-      btn.disabled = false;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (isManual) {
+        btn.textContent = '↻  Refresh Data';
+        btn.disabled = false;
+      }
     }
-  });
+  };
+
+  btn.addEventListener('click', () => fetchAndUpdate(true));
+  
+  // Auto-refresh every 2 seconds
+  setInterval(() => fetchAndUpdate(false), 2000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
