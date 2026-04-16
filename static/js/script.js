@@ -246,20 +246,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function randomShelf() { return shelves[Math.floor(Math.random() * shelves.length)]; }
 
-  function bfsPath(start, goal) {
-    const q     = [[start]];
-    const vis   = new Set([`${start.r},${start.c}`]);
-    const dirs  = [{r:-1,c:0},{r:1,c:0},{r:0,c:-1},{r:0,c:1}];
-    while (q.length) {
-      const path = q.shift();
-      const cur  = path[path.length - 1];
-      if (cur.r === goal.r && cur.c === goal.c) return path;
+  function heuristic(a, b) {
+    return Math.abs(a.r - b.r) + Math.abs(a.c - b.c);
+  }
+
+  function aStarPath(start, goal) {
+    const openSet = [{r: start.r, c: start.c, g: 0, f: heuristic(start, goal), path: [start]}];
+    const closedSet = new Set();
+    const dirs = [{r:-1,c:0},{r:1,c:0},{r:0,c:-1},{r:0,c:1}];
+
+    while (openSet.length > 0) {
+      openSet.sort((a, b) => a.f - b.f);
+      const current = openSet.shift();
+      const k = `${current.r},${current.c}`;
+
+      if (current.r === goal.r && current.c === goal.c) return current.path;
+      
+      closedSet.add(k);
+
       for (const d of dirs) {
-        const nr = cur.r + d.r, nc = cur.c + d.c;
-        const k  = `${nr},${nc}`;
-        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS &&
-            !vis.has(k) && !shelfSet.has(k)) {
-          vis.add(k); q.push([...path, {r:nr,c:nc}]);
+        const nr = current.r + d.r, nc = current.c + d.c;
+        const nk = `${nr},${nc}`;
+
+        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !closedSet.has(nk) && !shelfSet.has(nk)) {
+          const g = current.g + 1;
+          const f = g + heuristic({r: nr, c: nc}, goal);
+          
+          let existing = openSet.find(n => n.r === nr && n.c === nc);
+          if (existing) {
+            if (g < existing.g) {
+              existing.g = g;
+              existing.f = f;
+              existing.path = [...current.path, {r: nr, c: nc}];
+            }
+          } else {
+            openSet.push({r: nr, c: nc, g, f, path: [...current.path, {r: nr, c: nc}]});
+          }
         }
       }
     }
@@ -275,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
       c       : i * Math.floor(COLS / NUM_ROBOTS),
       state   : 'moving',       // moving | carrying | idle
       target,
-      path    : bfsPath({r:0,c:i*Math.floor(COLS/NUM_ROBOTS)}, target),
+      path    : aStarPath({r:0,c:i*Math.floor(COLS/NUM_ROBOTS)}, target),
       pathIdx : 0,
       tickAcc : 0,
     };
@@ -394,15 +416,30 @@ document.addEventListener('DOMContentLoaded', () => {
     robot.tickAcc = 0;
 
     if (robot.pathIdx < robot.path.length - 1) {
-      robot.pathIdx++;
-      robot.r = robot.path[robot.pathIdx].r;
-      robot.c = robot.path[robot.pathIdx].c;
+      const nextStep = robot.path[robot.pathIdx + 1];
+      
+      // Collision Avoidance: Check if another robot is at or moving to nextStep this tick
+      let collision = false;
+      for (const other of robots) {
+        if (other.id !== robot.id) {
+          // If another robot is currently at that cell
+          if (other.r === nextStep.r && other.c === nextStep.c) {
+            collision = true; break;
+          }
+        }
+      }
+
+      if (!collision) {
+        robot.pathIdx++;
+        robot.r = robot.path[robot.pathIdx].r;
+        robot.c = robot.path[robot.pathIdx].c;
+      }
     } else {
       // reached destination
       if (robot.state === 'moving') {
         robot.state = 'carrying';
         // now go to exit
-        robot.path    = bfsPath({r:robot.r, c:robot.c}, EXIT);
+        robot.path    = aStarPath({r:robot.r, c:robot.c}, EXIT);
         robot.pathIdx = 0;
       } else if (robot.state === 'carrying') {
         // delivered – pick new order
@@ -411,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
         robot.state = 'moving';
         const target  = randomShelf();
         robot.target  = target;
-        robot.path    = bfsPath({r:robot.r,c:robot.c}, target);
+        robot.path    = aStarPath({r:robot.r,c:robot.c}, target);
         robot.pathIdx = 0;
       }
     }
@@ -439,6 +476,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loop();
+
+  // ── Sync to Backend ──
+  setInterval(() => {
+    if (!simRunning) return;
+    const active = robots.filter(r => r.state === 'carrying' || (r.state === 'moving' && r.pathIdx < r.path.length - 1)).length;
+    const idle = NUM_ROBOTS - active;
+    
+    fetch('/api/simulation-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        active_robots: active,
+        idle_robots: idle,
+        total_orders: totalOrders,
+        completed_orders: ordersCompleted
+      })
+    }).catch(e => console.error("Sync error:", e));
+  }, 1000);
 
   // ── Controls ──
   const startBtn  = document.getElementById('sim-start');

@@ -7,32 +7,31 @@ app = Flask(__name__)
 app.secret_key = "smart_warehouse_secret_2024"
 
 # ─────────────────────────────────────────────
-#  Dummy data generators
+#  Global simulation state
 # ─────────────────────────────────────────────
 
+global_simulation_state = {
+    "total_robots"      : 4,
+    "active_robots"     : 0,
+    "idle_robots"       : 4,
+    "total_orders"      : 0,
+    "completed_orders"  : 0,
+    "pending_orders"    : 0,
+    "system_efficiency" : 0,
+    "avg_completion"    : 0,
+    "avg_utilization"   : 0,
+    "warehouse_capacity": 500,
+    "current_inventory" : 480,
+    "items_delivered"   : 0,
+    "last_updated"      : datetime.now().strftime("%H:%M:%S"),
+    "hourly_throughput" : [0 for _ in range(12)],
+    "robot_utilization" : [0 for _ in range(4)],
+    "order_status"      : {"completed": 0, "pending": 0, "failed": 0},
+}
+
 def get_dashboard_data():
-    return {
-        "total_robots"      : 5,
-        "active_robots"     : random.randint(2, 5),
-        "idle_robots"       : random.randint(0, 2),
-        "total_orders"      : random.randint(80, 120),
-        "completed_orders"  : random.randint(60, 100),
-        "pending_orders"    : random.randint(5, 20),
-        "system_efficiency" : round(random.uniform(82, 98), 1),
-        "avg_completion"    : round(random.uniform(4.2, 9.8), 1),
-        "avg_utilization"   : round(random.uniform(70, 95), 1),
-        "warehouse_capacity": 500,
-        "current_inventory" : random.randint(300, 480),
-        "items_delivered"   : random.randint(200, 400),
-        "last_updated"      : datetime.now().strftime("%H:%M:%S"),
-        "hourly_throughput" : [random.randint(10, 40) for _ in range(12)],
-        "robot_utilization" : [round(random.uniform(60, 98), 1) for _ in range(5)],
-        "order_status"      : {
-            "completed" : random.randint(60, 90),
-            "pending"   : random.randint(5, 15),
-            "failed"    : random.randint(0, 5),
-        },
-    }
+    global_simulation_state["last_updated"] = datetime.now().strftime("%H:%M:%S")
+    return global_simulation_state
 
 
 # ─────────────────────────────────────────────
@@ -52,8 +51,43 @@ def dashboard():
 
 @app.route("/api/dashboard-refresh")
 def dashboard_refresh():
-    """AJAX endpoint – returns fresh dummy stats as JSON."""
+    """AJAX endpoint – returns live stats as JSON."""
     return jsonify(get_dashboard_data())
+
+
+@app.route("/api/simulation-sync", methods=["POST"])
+def simulation_sync():
+    """Receives simulation updates from the client canvas."""
+    data = request.json
+    if not data:
+        return jsonify({"status": "error"}), 400
+        
+    global global_simulation_state
+    
+    global_simulation_state["active_robots"] = data.get("active_robots", global_simulation_state["active_robots"])
+    global_simulation_state["idle_robots"] = data.get("idle_robots", global_simulation_state["idle_robots"])
+    global_simulation_state["total_orders"] = data.get("total_orders", global_simulation_state["total_orders"])
+    global_simulation_state["completed_orders"] = data.get("completed_orders", global_simulation_state["completed_orders"])
+    
+    # Calculate derived stats
+    total = global_simulation_state["total_orders"]
+    completed = global_simulation_state["completed_orders"]
+    
+    global_simulation_state["pending_orders"] = max(0, total - completed)
+    if total > 0:
+        global_simulation_state["system_efficiency"] = round((completed / total) * 100, 1)
+        
+    global_simulation_state["order_status"] = {
+        "completed": completed,
+        "pending": global_simulation_state["pending_orders"],
+        "failed": 0
+    }
+    
+    # Store robot specific data if needed
+    if "robot_utilization" in data:
+        global_simulation_state["robot_utilization"] = data["robot_utilization"]
+        
+    return jsonify({"status": "success"})
 
 
 @app.route("/simulation")
