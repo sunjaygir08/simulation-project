@@ -77,7 +77,10 @@ def simulation_sync():
     if total > 0:
         global_simulation_state["system_efficiency"] = round((completed / total) * 100, 1)
         
-    failed_orders = int(completed * 0.05) # Assume 5% of orders fail due to imaginary issues
+    # Make failures more obvious! 15% failure rate, plus instantly show 1 fail if there's any completion
+    failed_orders = int(completed * 0.15)
+    if completed > 2 and failed_orders == 0:
+        failed_orders = 1
         
     global_simulation_state["order_status"] = {
         "completed": completed,
